@@ -22,4 +22,4 @@ bind = , Print, exec, quickshell -c hyprquickshot -n
 ```
 
 ## Credit
-[hprquickshot](https://github.com/JamDon2/hyprquickshot)
+[hyprquickshot](https://github.com/JamDon2/hyprquickshot)
