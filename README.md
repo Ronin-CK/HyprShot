@@ -19,11 +19,11 @@ git clone https://github.com/Ronin-CK/HyprShot ~/.config/quickshell/HyprShot
 ### run on terminal (not necessary )
 
 ```bash
-quickshell -c hyprquickshot -n
+quickshell -c HyprShot -n
 ```
 ### Add this line to you hyprland.conf
 ```bash
-bind = , Print, exec, quickshell -c hyprquickshot -n
+bind = , Print, exec, quickshell -c HyprShot -n
 ```
 
 ## Credit
