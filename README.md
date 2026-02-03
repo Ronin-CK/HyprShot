@@ -9,51 +9,68 @@ Features a modern overlay UI with shader-based dimming, smooth spring animations
 
 ## ✨ Features
 
-* **3 Capture Modes:**
-    * **Region:** Freehand selection with alignment guides.
-    * **Window:** Automatically snaps to open Hyprland windows.
-    * **Screen:** Instant full-screen capture.
-* **Modern UI:**
-    * Floating "Pill" control bar to switch modes.
-    * Smooth spring animations for selection resizing.
-    * Fragment shader for smooth dimming and rounded corners.
-* **Smart Saving:** Automatically saves to your `Pictures/Screenshots` folder AND copies to clipboard.
+*   **3 Capture Modes:**
+    *   **Region:** Freehand selection with alignment guides.
+    *   **Window:** Automatically snaps to open Hyprland windows.
+    *   **Screen:** Instant full-screen capture.
+*   **Modern UI:**
+    *   Floating "Pill" control bar to switch modes.
+    *   **Animations:** Smooth spring animations for selection resizing.
+    *   **Visuals:** Fragment shader for smooth dimming and rounded corners.
+*   **Smart Saving:**
+    *   **Quick Save:** Automatically saves to `Pictures/Screenshots` and copies to clipboard.
+    *   **Editor Mode:** Opens the screenshot in **Satty** for annotation (Optional).
 
-🎥 Demo
+## 🎥 Demo
 
-https://github.com/user-attachments/assets/904066a7-3a67-4795-8353-0461219386a7
-
+[Watch the Demo](https://github.com/user-attachments/assets/904066a7-3a67-4795-8353-0461219386a7)
 
 ## 📦 Requirements
 
 1.  **[Quickshell](https://github.com/outfoxxed/quickshell)** (The shell environment)
-2.  `grim` (For capturing the screen)
-3.  `imagemagick` (For cropping the screenshot)
-4.  `wl-clipboard` (For copying to clipboard)
+2.  `grim` (Screen capture)
+3.  `imagemagick` (Image processing)
+4.  `wl-clipboard` (Clipboard support)
+5.  `satty` (Optional: for Editor Mode)
 
 ## 🚀 Installation
 
 ### 1. Install System Dependencies
 **Arch Linux:**
 ```bash
-sudo pacman -S grim imagemagick wl-clipboard
+sudo pacman -S grim imagemagick wl-clipboard satty
 ```
+
+### 2. Install Quickshell
 ```bash
 yay -S quickshell
 ```
-## Clone Repo
+
+### 3. Clone Repository
 ```bash
 git clone https://github.com/Ronin-CK/HyprShot ~/.config/quickshell/HyprShot
 ```
-### run on terminal (not necessary )
 
+### 4. Basic Test
+Run this in your terminal to verify installation:
 ```bash
 quickshell -c HyprShot -n
 ```
-### Add this line to you hyprland.conf
-```bash
-bind = , Print, exec, quickshell -c HyprShot -n
+
+## ⚙️ Configuration (Hyprland)
+
+Add the following keybindings to your `hyprland.conf`:
+
+```ini
+# 1. Standard Screenshot (Quick Save)
+# Saves directly to ~/Pictures/Screenshots and copies to clipboard
+bind = SUPER SHIFT, S, exec, quickshell -c HyprShot -n
+
+# 2. Editor Mode (Annotation)
+# Opens the screenshot in Satty for editing before saving
+# Requires: satty
+bind = SUPER CTRL SHIFT, S, exec, HYPRSHOT_EDITOR=1 quickshell -c HyprShot -n
 ```
 
 ## Credit
-[hyprquickshot](https://github.com/JamDon2/hyprquickshot)
+*   [hyprquickshot](https://github.com/JamDon2/hyprquickshot) - Inspiration
