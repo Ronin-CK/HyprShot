@@ -6,6 +6,8 @@ Features a modern overlay UI with shader-based dimming, smooth spring animations
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Wayland](https://img.shields.io/badge/Wayland-Native-green.svg)
 ![Quickshell](https://img.shields.io/badge/Built%20With-Quickshell-cba6f7.svg)
+![Hyprland](https://img.shields.io/badge/Desktop-Hyprland-blue.svg)
+![Nix](https://img.shields.io/badge/Nix-Flake-blue.svg)
 
 ## ✨ Features
 
@@ -19,6 +21,7 @@ Features a modern overlay UI with shader-based dimming, smooth spring animations
     *   **Visuals:** Fragment shader for smooth dimming and rounded corners.
 *   **Smart Saving:**
     *   **Quick Save:** Automatically saves to `Pictures/Screenshots` and copies to clipboard.
+    *   **Notifications:** System notification with preview upon save.
     *   **Editor Mode:** Opens the screenshot in **Satty** for annotation (Optional).
 
 ## 🎥 Demo
@@ -60,6 +63,37 @@ Run this in your terminal to verify installation:
 ```bash
 quickshell -c HyprQuickFrame -n
 ```
+
+## ❄️ Nix Installation
+
+This project includes a `flake.nix` for easy installation.
+
+**Run directly:**
+```bash
+nix run github:Ronin-CK/HyprQuickFrame
+```
+
+**Install in configuration:**
+Add to your inputs:
+```nix
+inputs.HyprQuickFrame.url = "github:Ronin-CK/HyprQuickFrame";
+inputs.HyprQuickFrame.inputs.nixpkgs.follows = "nixpkgs";
+```
+Then add to your packages:
+```nix
+environment.systemPackages = [ inputs.HyprQuickFrame.packages.${pkgs.system}.default ];
+```
+
+**Using Overlay:**
+```nix
+nixpkgs = {
+  overlays = [
+    inputs.HyprQuickFrame.overlays.default
+  ];
+};
+```
+Then install via `pkgs.hyprquickframe`.
+
 
 ## ⚙️ Configuration (Hyprland)
 
