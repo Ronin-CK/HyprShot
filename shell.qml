@@ -44,8 +44,15 @@ FreezeScreen {
         const timestamp = Date.now();
         const path = Quickshell.cachePath(`screenshot-${timestamp}.png`);
         tempPath = path;
-        Quickshell.execDetached(["grim", path]);
-        showTimer.start();
+        captureProcess.command = ["grim", path];
+        captureProcess.running = true;
+    }
+
+    Process {
+        id: captureProcess
+
+        running: false
+        onExited: showTimer.start()
     }
 
     Connections {
