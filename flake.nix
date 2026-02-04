@@ -14,15 +14,17 @@
       ];
       forAllSystems =
         f: nixpkgs.lib.genAttrs supportedSystems (system: f (import nixpkgs { inherit system; }));
-      
+
       # Define runtime dependencies once
-      runtimeDeps = pkgs: with pkgs; [
-        quickshell
-        grim
-        imagemagick
-        wl-clipboard
-        satty
-      ];
+      runtimeDeps =
+        pkgs: with pkgs; [
+          quickshell
+          grim
+          imagemagick
+          wl-clipboard
+          satty
+          libnotify
+        ];
     in
     {
       overlays.default = final: prev: {
@@ -33,14 +35,15 @@
         default = pkgs.stdenv.mkDerivation {
           pname = "hyprquickframe";
           version = "0.1.0";
-          
+
           src = pkgs.lib.cleanSourceWith {
             src = ./.;
-            filter = path: type:
+            filter =
+              path: type:
               let
                 baseName = baseNameOf path;
               in
-              ! (builtins.elem baseName [
+              !(builtins.elem baseName [
                 "flake.nix"
                 "flake.lock"
                 ".git"
