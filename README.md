@@ -38,6 +38,7 @@ Features a modern overlay UI with shader-based dimming, smooth spring animations
 2.  `grim` (Screen capture)
 3.  `imagemagick` (Image processing)
 4.  `wl-clipboard` (Clipboard support)
+5.  `libnotify` (Desktop notifications)
 5.  `satty` (Optional: for Editor Mode)
 
 ## 🚀 Installation
@@ -45,7 +46,7 @@ Features a modern overlay UI with shader-based dimming, smooth spring animations
 ### 1. Install System Dependencies
 **Arch Linux:**
 ```bash
-sudo pacman -S grim imagemagick wl-clipboard satty
+sudo pacman -S grim imagemagick wl-clipboard satty libnotify
 ```
 
 ### 2. Install Quickshell
@@ -107,7 +108,7 @@ bind = SUPER SHIFT, S, exec, quickshell -c HyprQuickFrame -n
 # 2. Editor Mode (Annotation)
 # Opens the screenshot in Satty for editing before saving
 # Requires: satty
-bind = SUPER CTRL SHIFT, S, exec, HYPRSHOT_EDITOR=1 quickshell -c HyprQuickFrame -n
+bind = SUPER CTRL SHIFT, S, exec, HYPRQUICKFRAME_EDITOR=1 quickshell -c HyprQuickFrame -n
 ```
 
 ## Credit
