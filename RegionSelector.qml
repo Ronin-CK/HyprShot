@@ -12,6 +12,7 @@ Item {
     property url fragmentShader: Qt.resolvedUrl("dimming.frag.qsb")
 
     property point startPos
+    property bool isDragging: mouseArea.pressed
 
     // Selection Box Geometry
     property real selectionX: 0
@@ -19,30 +20,17 @@ Item {
     property real selectionWidth: 0
     property real selectionHeight: 0
 
-    property real targetX: 0
-    property real targetY: 0
-    property real targetWidth: 0
-    property real targetHeight: 0
-
-    // Mouse Tracking for Crosshair
+    // Mouse Tracking
     property real mouseX: 0
     property real mouseY: 0
 
-    // Animations
-    Behavior on selectionX { SpringAnimation { spring: 4; damping: 0.4 } }
-    Behavior on selectionY { SpringAnimation { spring: 4; damping: 0.4 } }
-    Behavior on selectionHeight { SpringAnimation { spring: 4; damping: 0.4 } }
-    Behavior on selectionWidth { SpringAnimation { spring: 4; damping: 0.4 } }
+    // Animations: Only enabled when NOT dragging to avoid stutter
+    Behavior on selectionX { enabled: !root.isDragging; SpringAnimation { spring: 4; damping: 0.4 } }
+    Behavior on selectionY { enabled: !root.isDragging; SpringAnimation { spring: 4; damping: 0.4 } }
+    Behavior on selectionHeight { enabled: !root.isDragging; SpringAnimation { spring: 4; damping: 0.4 } }
+    Behavior on selectionWidth { enabled: !root.isDragging; SpringAnimation { spring: 4; damping: 0.4 } }
 
-    // Redraw guides when anything moves
-    onSelectionXChanged: guides.requestPaint()
-    onSelectionYChanged: guides.requestPaint()
-    onSelectionWidthChanged: guides.requestPaint()
-    onSelectionHeightChanged: guides.requestPaint()
-    onMouseXChanged: guides.requestPaint()
-    onMouseYChanged: guides.requestPaint()
-
-    // 1. Dimming Background
+    // 1. Dimming Background (GPU Shader)
     ShaderEffect {
         anchors.fill: parent
         z: 0
@@ -54,45 +42,29 @@ Item {
         fragmentShader: root.fragmentShader
     }
 
-    // 2. Alignment Guides (Canvas)
-    Canvas {
-        id: guides
-        anchors.fill: parent
-        z: 2
+    // 2. Optimized GPU Guides (Using Rectangles instead of Canvas)
+    // Vertical Guide
+    Rectangle {
+        x: root.isDragging ? root.selectionX : root.mouseX
+        y: 0; width: 1; height: parent.height
+        color: "white"; opacity: 0.3; z: 2
+    }
+    Rectangle {
+        x: root.isDragging ? (root.selectionX + root.selectionWidth) : -1
+        y: 0; width: 1; height: parent.height
+        color: "white"; opacity: 0.3; z: 2; visible: root.isDragging
+    }
 
-        onPaint: {
-            var ctx = getContext("2d");
-            ctx.clearRect(0, 0, width, height);
-
-            ctx.beginPath();
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-            ctx.lineWidth = 1;
-            ctx.setLineDash([5, 5]);
-
-            if (!mouseArea.pressed) {
-                // MODE 1: Crosshair at mouse cursor (Before clicking)
-                // Vertical
-                ctx.moveTo(root.mouseX, 0);
-                ctx.lineTo(root.mouseX, root.height);
-                // Horizontal
-                ctx.moveTo(0, root.mouseY);
-                ctx.lineTo(root.width, root.mouseY);
-            } else {
-                // MODE 2: Guides around the selection box (While dragging)
-                // Vertical Left & Right
-                ctx.moveTo(root.selectionX, 0);
-                ctx.lineTo(root.selectionX, root.height);
-                ctx.moveTo(root.selectionX + root.selectionWidth, 0);
-                ctx.lineTo(root.selectionX + root.selectionWidth, root.height);
-
-                // Horizontal Top & Bottom
-                ctx.moveTo(0, root.selectionY);
-                ctx.lineTo(root.width, root.selectionY);
-                ctx.moveTo(0, root.selectionY + root.selectionHeight);
-                ctx.lineTo(root.width, root.selectionY + root.selectionHeight);
-            }
-            ctx.stroke();
-        }
+    // Horizontal Guide
+    Rectangle {
+        x: 0; y: root.isDragging ? root.selectionY : root.mouseY
+        width: parent.width; height: 1
+        color: "white"; opacity: 0.3; z: 2
+    }
+    Rectangle {
+        x: 0; y: root.isDragging ? (root.selectionY + root.selectionHeight) : -1
+        width: parent.width; height: 1
+        color: "white"; opacity: 0.3; z: 2; visible: root.isDragging
     }
 
     // 3. Mouse Interaction
@@ -100,56 +72,35 @@ Item {
         id: mouseArea
         anchors.fill: parent
         z: 3
-        hoverEnabled: true // <--- Critical for tracking before click
-
+        hoverEnabled: true
         cursorShape: Qt.CrossCursor
-
-        Timer {
-            id: updateTimer
-            interval: 16
-            repeat: true
-            running: mouseArea.pressed
-            onTriggered: {
-                root.selectionX = root.targetX
-                root.selectionY = root.targetY
-                root.selectionWidth = root.targetWidth
-                root.selectionHeight = root.targetHeight
-            }
-        }
 
         onPressed: (mouse) => {
             root.startPos = Qt.point(mouse.x, mouse.y)
-            root.targetX = mouse.x
-            root.targetY = mouse.y
-            root.targetWidth = 0
-            root.targetHeight = 0
-            guides.requestPaint() // Force redraw to switch modes
+            root.selectionX = mouse.x
+            root.selectionY = mouse.y
+            root.selectionWidth = 0
+            root.selectionHeight = 0
         }
 
         onPositionChanged: (mouse) => {
-            // Always update global mouse trackers for the crosshair
             root.mouseX = mouse.x
             root.mouseY = mouse.y
 
             if (pressed) {
-                const x = Math.min(root.startPos.x, mouse.x)
-                const y = Math.min(root.startPos.y, mouse.y)
-                const width = Math.abs(mouse.x - root.startPos.x)
-                const height = Math.abs(mouse.y - root.startPos.y)
-
-                root.targetX = x
-                root.targetY = y
-                root.targetWidth = width
-                root.targetHeight = height
+                root.selectionX = Math.min(root.startPos.x, mouse.x)
+                root.selectionY = Math.min(root.startPos.y, mouse.y)
+                root.selectionWidth = Math.abs(mouse.x - root.startPos.x)
+                root.selectionHeight = Math.abs(mouse.y - root.startPos.y)
             }
         }
 
         onReleased: {
             root.regionSelected(
                 Math.round(root.selectionX),
-                                Math.round(root.selectionY),
-                                Math.round(root.selectionWidth),
-                                Math.round(root.selectionHeight)
+                Math.round(root.selectionY),
+                Math.round(root.selectionWidth),
+                Math.round(root.selectionHeight)
             )
         }
     }
