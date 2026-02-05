@@ -7,32 +7,39 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 
 FreezeScreen {
-    // --- SEGMENTED CONTROL UI ---
-
     id: root
 
     property var activeScreen: null
     property var hyprlandMonitor: Hyprland.focusedMonitor
     property string tempPath
-    // Default mode
     property string mode: "region"
     property var modes: ["region", "window", "screen"]
-    // Check for editor mode environment variable
     property bool editorMode: Quickshell.env("HYPRQUICKFRAME_EDITOR") === "1"
 
     function saveScreenshot(x, y, width, height) {
+        // Calculate global bounds (grim captures the whole desktop starting from top-left-most point)
+        let minX = 0;
+        let minY = 0;
+        if (Hyprland.monitors) {
+            for (let i = 0; i < Hyprland.monitors.length; i++) {
+                const m = Hyprland.monitors[i];
+                minX = Math.min(minX, m.x);
+                minY = Math.min(minY, m.y);
+            }
+        }
         const scale = hyprlandMonitor.scale;
-        const scaledX = Math.round((x + root.hyprlandMonitor.x) * scale);
-        const scaledY = Math.round((y + root.hyprlandMonitor.y) * scale);
+        const globalX = Math.round((x + root.hyprlandMonitor.x) * scale);
+        const globalY = Math.round((y + root.hyprlandMonitor.y) * scale);
+        const cropX = globalX - Math.round(minX * scale);
+        const cropY = globalY - Math.round(minY * scale);
         const scaledWidth = Math.round(width * scale);
         const scaledHeight = Math.round(height * scale);
         const picturesDir = Quickshell.env("XDG_PICTURES_DIR") || (Quickshell.env("HOME") + "/Pictures/Screenshots");
         const now = new Date();
         const timestamp = Qt.formatDateTime(now, "yyyy-MM-dd_hh-mm-ss");
         const outputPath = `${picturesDir}/screenshot-${timestamp}.png`;
-        // Commands
-        const sattyCommand = `magick "${tempPath}" -crop ${scaledWidth}x${scaledHeight}+${scaledX}+${scaledY} png:- | satty --filename - --output-filename "${outputPath}" --early-exit --init-tool brush && rm "${tempPath}"`;
-        const defaultCommand = `magick "${tempPath}" -crop ${scaledWidth}x${scaledHeight}+${scaledX}+${scaledY} "${outputPath}" && wl-copy --type image/png < "${outputPath}" && notify-send -a "HyprQuickFrame" -i "${outputPath}" -h string:image-path:"${outputPath}" "Screenshot Saved" "Saved to Pictures/Screenshots" && rm "${tempPath}"`;
+        const sattyCommand = `magick "${tempPath}" -crop ${scaledWidth}x${scaledHeight}+${cropX}+${cropY} png:- | satty --filename - --output-filename "${outputPath}" --early-exit --init-tool brush && rm "${tempPath}"`;
+        const defaultCommand = `magick "${tempPath}" -crop ${scaledWidth}x${scaledHeight}+${cropX}+${cropY} "${outputPath}" && wl-copy --type image/png < "${outputPath}" && notify-send -a "HyprQuickFrame" -i "${outputPath}" -h string:image-path:"${outputPath}" "Screenshot Saved" "Saved to Pictures/Screenshots" && rm "${tempPath}"`;
         screenshotProcess.command = ["sh", "-c", root.editorMode ? sattyCommand : defaultCommand];
         screenshotProcess.running = true;
         root.visible = false;
@@ -158,16 +165,13 @@ FreezeScreen {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 60
-        // Dimensions
         height: 50
         width: 300
         radius: height / 2
-        // Visuals: Dark Glass Effect
         color: Qt.rgba(0.15, 0.15, 0.15, 0.9)
         border.color: Qt.rgba(1, 1, 1, 0.15)
         border.width: 1
 
-        // The Sliding Blue Highlight (The "Pill")
         Rectangle {
             id: highlight
 
@@ -175,11 +179,9 @@ FreezeScreen {
             width: (parent.width - 8) / root.modes.length
             y: 4
             radius: height / 2
-            color: "#3478F6" // System Blue
-            // Calculate X position based on the current mode index
+            color: "#3478F6"
             x: 4 + (root.modes.indexOf(root.mode) * width)
 
-            // Smooth sliding animation
             Behavior on x {
                 NumberAnimation {
                     duration: 250
@@ -190,16 +192,14 @@ FreezeScreen {
 
         }
 
-        // The Text Labels
         Row {
             anchors.fill: parent
-            anchors.margins: 4 // Match highlight margins
+            anchors.margins: 4
 
             Repeater {
                 model: root.modes
 
                 Item {
-                    // Divide available width equally among items
                     width: (segmentedControl.width - 8) / root.modes.length
                     height: segmentedControl.height - 8
 
@@ -216,8 +216,7 @@ FreezeScreen {
 
                     Text {
                         anchors.centerIn: parent
-                        text: modelData.charAt(0).toUpperCase() + modelData.slice(1) // Capitalize
-                        // White text, slightly bolder when selected
+                        text: modelData.charAt(0).toUpperCase() + modelData.slice(1)
                         color: "white"
                         font.weight: root.mode === modelData ? Font.DemiBold : Font.Normal
                         font.pixelSize: 14
