@@ -43,8 +43,14 @@ Features a modern overlay UI with shader-based dimming, smooth spring animations
 
 ## 🚀 Installation
 
+### Arch Linux (AUR)
+You can install `hyprquickframe-git` (maintained by [@knownasnaffy](https://github.com/knownasnaffy)):
+
+```bash
+yay -S hyprquickframe-git
+```
+
 ### 1. Install System Dependencies
-**Arch Linux:**
 ```bash
 sudo pacman -S grim imagemagick wl-clipboard satty libnotify
 ```
