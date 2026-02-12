@@ -1,29 +1,29 @@
-import QtQuick  
-import Quickshell  
-import Quickshell.Wayland  
-  
-PanelWindow {  
-    id: root  
-      
+import QtQuick
+import Quickshell
+import Quickshell.Wayland
+
+PanelWindow {
+    id: root
+
     property var targetScreen: Quickshell.screens[0]
-    property alias contentItem: root.contentItem  
+    property alias contentItem: root.contentItem
 
     screen: targetScreen
+    exclusionMode: ExclusionMode.Ignore
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
-    anchors { 
-        left: true  
-        right: true  
-        top: true  
-        bottom: true  
-    }  
-  
-    exclusionMode: ExclusionMode.Ignore  
-    WlrLayershell.layer: WlrLayer.Overlay  
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand  
-  
-    ScreencopyView {  
+    anchors {
+        left: true
+        right: true
+        top: true
+        bottom: true
+    }
+
+    ScreencopyView {
         captureSource: root.targetScreen
-        anchors.fill: parent  
+        anchors.fill: parent
         z: -1
-    }  
+    }
+
 }
