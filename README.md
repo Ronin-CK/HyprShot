@@ -117,5 +117,11 @@ bind = SUPER SHIFT, S, exec, quickshell -c HyprQuickFrame -n
 bind = SUPER CTRL SHIFT, S, exec, HYPRQUICKFRAME_EDITOR=1 quickshell -c HyprQuickFrame -n
 ```
 
-## Credit
-*   [hyprquickshot](https://github.com/JamDon2/hyprquickshot) - Inspiration
+## ⚖️ License & Attribution
+
+This project is licensed under the **MIT License**.
+
+* **Original Work:** [HyprQuickshot](https://github.com/JamDon2/hyprquickshot) © 2025 JamDon2.
+* **Enhancements & Modifications:** © 2026 Chandra Kant (Ronin-CK).
+
+HyprQuickFrame began as a fork of HyprQuickshot. It has been significantly extended with a custom Quickshell UI and an integrated editor mode. We honor the original work of JamDon2 while providing a modernized experience for Hyprland users.
