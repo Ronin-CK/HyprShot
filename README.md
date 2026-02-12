@@ -21,15 +21,7 @@ Features a modern overlay UI with shader-based dimming, "juicy" bouncy animation
 *   **Editor Support**: If you have `satty` installed, you can annotate right after capturing.
 
 ## 🎥 Demo
-
-<details>
-  <summary>Click to watch the demo</summary>
-
-  <video controls>
-    <source src="VIDEO_URL_HERE.mp4" type="video/mp4">
-  </video>
-
-</details>
+https://github.com/user-attachments/assets/1cb331a7-c9d2-474f-96e2-d78a18bd3a5c
 
 ## ⌨️ Shortcuts
 
