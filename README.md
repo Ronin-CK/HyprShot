@@ -19,9 +19,6 @@ Features a modern overlay UI with shader-based dimming, "juicy" bouncy animation
 *   **Fast**: It launches instantly. No waiting.
 *   **Editor Support**: If you have `satty` installed, you can annotate right after capturing.
 
-## 🎥 Demo
-https://github.com/user-attachments/assets/1cb331a7-c9d2-474f-96e2-d78a18bd3a5c
-
 ## ⌨️ Shortcuts
 
 *   `r`: Region Mode
@@ -30,6 +27,10 @@ https://github.com/user-attachments/assets/1cb331a7-c9d2-474f-96e2-d78a18bd3a5c
 *   `t`: Toggle Temp Mode
 *   `k`: Toggle KDE Share
 *   `Escape`: Quit
+
+## 🎥 Demo
+https://github.com/user-attachments/assets/1cb331a7-c9d2-474f-96e2-d78a18bd3a5c
+
 
 ## 📦 Requirements
 
