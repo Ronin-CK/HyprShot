@@ -163,24 +163,6 @@ FreezeScreen {
         connectivityProcess.running = true;
     }
 
-    Theme {
-        id: theme
-    }
-
-    FileView {
-        id: themeFile
-
-        path: Quickshell.shellDir.toString().replace(/^file:\/\//, "") + "/theme.toml"
-        onTextChanged: {
-            try {
-                let rawText = (typeof text === 'function') ? text() : text;
-                theme.source = root.parseTOML(rawText);
-            } catch (e) {
-                console.warn("Failed to parse theme.toml:", e);
-            }
-        }
-    }
-
     Process {
         id: captureProcess
 
@@ -195,11 +177,57 @@ FreezeScreen {
         }
     }
 
+    Theme {
+        id: theme
+    }
+
+    FileView {
+        id: themeFile
+
+        property string configHome: Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")
+        property string userPath1: configHome + "/hyprquickframe/theme.toml"
+        property string userPath2: configHome + "/quickshell/HyprQuickFrame/theme.toml"
+        property string defaultPath: Quickshell.shellDir.toString().replace(/^file:\/\//, "") + "/theme.toml"
+
+        path: defaultPath
+
+        Component.onCompleted: {
+            themePathCheck.command = ["sh", "-c",
+                `if [ -f "${userPath1}" ]; then echo "${userPath1}";
+                 elif [ -f "${userPath2}" ]; then echo "${userPath2}";
+                 else echo "${defaultPath}"; fi`
+            ];
+            themePathCheck.running = true;
+        }
+
+        onTextChanged: {
+            try {
+                let rawText = (typeof text === 'function') ? text() : text;
+                theme.source = root.parseTOML(rawText);
+            } catch (e) {
+                console.warn("Failed to parse theme.toml:", e);
+            }
+        }
+    }
+
+    Process {
+        id: themePathCheck
+
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                themeFile.path = this.text.trim();
+                console.log("Theme loaded from:", themeFile.path);
+            }
+        }
+    }
+
     Connections {
         function onFocusedMonitorChanged() {
             const monitor = Hyprland.focusedMonitor;
             if (!monitor)
-                return ;
+                return;
 
             for (const screen of Quickshell.screens) {
                 if (screen.name === monitor.name)
