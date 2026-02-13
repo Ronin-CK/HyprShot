@@ -53,7 +53,14 @@
               ]);
           };
 
-          nativeBuildInputs = [ pkgs.makeWrapper ];
+          nativeBuildInputs = with pkgs; [
+            makeWrapper
+            qt6.wrapQtAppsHook
+          ];
+
+          buildInputs = with pkgs; [
+            qt6.qt5compat
+          ];
 
           dontBuild = true;
 
