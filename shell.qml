@@ -33,13 +33,11 @@ FreezeScreen {
             if (!line || line.startsWith("#"))
                 continue;
 
-            // Section header
             const secMatch = line.match(/^\[(\w+)\]$/);
             if (secMatch) {
                 section = secMatch[1];
                 continue;
             }
-            // Quoted string value
             const quotedMatch = line.match(/^(\w+)\s*=\s*"([^"]*)"/);
             if (quotedMatch) {
                 const rawKey = quotedMatch[1];
@@ -47,7 +45,6 @@ FreezeScreen {
                 result[key] = quotedMatch[2];
                 continue;
             }
-            // Unquoted value
             const unquotedMatch = line.match(/^(\w+)\s*=\s*([^\s#]+)/);
             if (unquotedMatch) {
                 const rawKey = unquotedMatch[1];
@@ -61,7 +58,6 @@ FreezeScreen {
                     const num = parseFloat(val);
                     if (!isNaN(num))
                         val = num;
-
                 }
                 result[key] = val;
                 continue;
@@ -75,18 +71,18 @@ FreezeScreen {
     }
 
     function calculateCrop(x, y, width, height) {
-        let minX = 0;
-        let minY = 0;
-        if (Hyprland.monitors) {
-            for (let i = 0; i < Hyprland.monitors.length; i++) {
-                const m = Hyprland.monitors[i];
-                minX = Math.min(minX, m.x);
-                minY = Math.min(minY, m.y);
-            }
+        let minX = Infinity;
+        let minY = Infinity;
+        const monitors = Hyprland.monitors.values;
+        for (const m of monitors) {
+            minX = Math.min(minX, m.lastIpcObject.x);
+            minY = Math.min(minY, m.lastIpcObject.y);
         }
         const scale = hyprlandMonitor.scale;
-        const globalX = Math.round((x + root.hyprlandMonitor.x) * scale);
-        const globalY = Math.round((y + root.hyprlandMonitor.y) * scale);
+        const monitorX = root.hyprlandMonitor.lastIpcObject.x;
+        const monitorY = root.hyprlandMonitor.lastIpcObject.y;
+        const globalX = Math.round((x + monitorX) * scale);
+        const globalY = Math.round((y + monitorY) * scale);
         return {
             "cropX": globalX - Math.round(minX * scale),
             "cropY": globalY - Math.round(minY * scale),
@@ -186,7 +182,6 @@ FreezeScreen {
             for (const screen of Quickshell.screens) {
                 if (screen.name === monitor.name)
                     activeScreen = screen;
-
             }
         }
 
@@ -223,7 +218,6 @@ FreezeScreen {
             root.editActive = !root.editActive;
             if (root.editActive)
                 root.tempActive = false;
-
         }
     }
 
@@ -233,7 +227,6 @@ FreezeScreen {
             root.tempActive = !root.tempActive;
             if (root.tempActive)
                 root.editActive = false;
-
         }
     }
 
@@ -243,7 +236,6 @@ FreezeScreen {
             root.shareActive = !root.shareActive;
             if (root.shareActive && !connectivityProcess.running && root.connectivityStatus !== 0)
                 connectivityProcess.running = true;
-
         }
     }
 
@@ -263,7 +255,6 @@ FreezeScreen {
         onExited: (code) => {
             if (code !== 0)
                 console.error("Screenshot pipeline failed with exit code:", code);
-
             Qt.quit();
         }
 
@@ -271,7 +262,6 @@ FreezeScreen {
             onStreamFinished: {
                 if (this.text.trim())
                     console.log(this.text);
-
             }
         }
 
@@ -279,10 +269,8 @@ FreezeScreen {
             onStreamFinished: {
                 if (this.text.trim())
                     console.warn(this.text);
-
             }
         }
-
     }
 
     Process {
@@ -346,10 +334,8 @@ FreezeScreen {
             x: 4 + (root.modes.slice(0, root.modes.indexOf(root.mode)).filter((m) => {
                 if (m === "edit")
                     return !root.editActive;
-
                 if (m === "temp")
                     return !root.tempActive;
-
                 return true;
             }).length * root.tabItemSize)
 
@@ -359,9 +345,7 @@ FreezeScreen {
                     damping: 0.25
                     mass: 1
                 }
-
             }
-
         }
 
         Row {
@@ -427,9 +411,7 @@ FreezeScreen {
                             NumberAnimation {
                                 duration: 150
                             }
-
                         }
-
                     }
 
                     Behavior on width {
@@ -438,13 +420,9 @@ FreezeScreen {
                             damping: 0.25
                             mass: 1
                         }
-
                     }
-
                 }
-
             }
-
         }
 
         Behavior on width {
@@ -453,7 +431,6 @@ FreezeScreen {
                 damping: 0.25
                 mass: 1
             }
-
         }
 
         layer.effect: DropShadow {
@@ -463,7 +440,6 @@ FreezeScreen {
             color: theme.barShadow
             verticalOffset: 4
         }
-
     }
 
     QuickToggle {
@@ -502,10 +478,8 @@ FreezeScreen {
         iconColor: {
             if (root.connectivityStatus === 1)
                 return theme.shareConnected;
-
             if (root.connectivityStatus === 2)
                 return theme.shareErrorIcon;
-
             return theme.sharePending;
         }
         backgroundColor: root.connectivityStatus === 2 ? theme.shareErrorBackground : theme.toggleBackground
@@ -533,7 +507,5 @@ FreezeScreen {
                 }
             }
         }
-
     }
-
 }
