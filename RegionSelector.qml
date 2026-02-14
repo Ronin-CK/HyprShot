@@ -49,6 +49,7 @@ Item {
     property bool canceled: false
     property bool selecting: false
     property bool animateSelection: true
+    property bool globalAnimations: true
     property alias pressed: mouseArea.pressed
 
     signal regionSelected(real x, real y, real width, real height)
@@ -209,7 +210,7 @@ Item {
     }
 
     Behavior on selectionX {
-        enabled: root.animateSelection
+        enabled: root.animateSelection && root.globalAnimations
 
         // Selection animations using spring dynamics
         SpringAnimation {
@@ -220,7 +221,7 @@ Item {
     }
 
     Behavior on selectionY {
-        enabled: root.animateSelection
+        enabled: root.animateSelection && root.globalAnimations
 
         SpringAnimation {
             spring: 4
@@ -230,7 +231,7 @@ Item {
     }
 
     Behavior on selectionWidth {
-        enabled: root.animateSelection
+        enabled: root.animateSelection && root.globalAnimations
 
         SpringAnimation {
             spring: 4
@@ -240,7 +241,7 @@ Item {
     }
 
     Behavior on selectionHeight {
-        enabled: root.animateSelection
+        enabled: root.animateSelection && root.globalAnimations
 
         SpringAnimation {
             spring: 4
