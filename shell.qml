@@ -1,23 +1,8 @@
 /*
  * Copyright (c) 2026 Ronin-CK
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 import Qt5Compat.GraphicalEffects
@@ -80,6 +65,7 @@ FreezeScreen {
                     const num = parseFloat(val);
                     if (!isNaN(num))
                         val = num;
+
                 }
                 result[key] = val;
                 continue;
@@ -190,16 +176,12 @@ FreezeScreen {
         property string defaultPath: Quickshell.shellDir.toString().replace(/^file:\/\//, "") + "/theme.toml"
 
         path: defaultPath
-
         Component.onCompleted: {
-            themePathCheck.command = ["sh", "-c",
-                `if [ -f "${userPath1}" ]; then echo "${userPath1}";
+            themePathCheck.command = ["sh", "-c", `if [ -f "${userPath1}" ]; then echo "${userPath1}";
                  elif [ -f "${userPath2}" ]; then echo "${userPath2}";
-                 else echo "${defaultPath}"; fi`
-            ];
+                 else echo "${defaultPath}"; fi`];
             themePathCheck.running = true;
         }
-
         onTextChanged: {
             try {
                 let rawText = (typeof text === 'function') ? text() : text;
@@ -221,17 +203,19 @@ FreezeScreen {
                 console.log("Theme loaded from:", themeFile.path);
             }
         }
+
     }
 
     Connections {
         function onFocusedMonitorChanged() {
             const monitor = Hyprland.focusedMonitor;
             if (!monitor)
-                return;
+                return ;
 
             for (const screen of Quickshell.screens) {
                 if (screen.name === monitor.name)
                     activeScreen = screen;
+
             }
         }
 
@@ -268,6 +252,7 @@ FreezeScreen {
             root.editActive = !root.editActive;
             if (root.editActive)
                 root.tempActive = false;
+
         }
     }
 
@@ -277,6 +262,7 @@ FreezeScreen {
             root.tempActive = !root.tempActive;
             if (root.tempActive)
                 root.editActive = false;
+
         }
     }
 
@@ -286,6 +272,7 @@ FreezeScreen {
             root.shareActive = !root.shareActive;
             if (root.shareActive && !connectivityProcess.running && root.connectivityStatus !== 0)
                 connectivityProcess.running = true;
+
         }
     }
 
@@ -305,6 +292,7 @@ FreezeScreen {
         onExited: (code) => {
             if (code !== 0)
                 console.error("Screenshot pipeline failed with exit code:", code);
+
             Qt.quit();
         }
 
@@ -312,6 +300,7 @@ FreezeScreen {
             onStreamFinished: {
                 if (this.text.trim())
                     console.log(this.text);
+
             }
         }
 
@@ -319,8 +308,10 @@ FreezeScreen {
             onStreamFinished: {
                 if (this.text.trim())
                     console.warn(this.text);
+
             }
         }
+
     }
 
     Process {
@@ -340,6 +331,7 @@ FreezeScreen {
         dimOpacity: theme.dimOpacity
         borderRadius: theme.borderRadius
         outlineThickness: theme.outlineThickness
+        globalAnimations: theme.animations
         onRegionSelected: (x, y, width, height) => {
             saveScreenshot(x, y, width, height);
         }
@@ -354,6 +346,7 @@ FreezeScreen {
         dimOpacity: theme.dimOpacity
         borderRadius: theme.borderRadius
         outlineThickness: theme.outlineThickness
+        animateSelection: theme.animations
         onRegionSelected: (x, y, width, height) => {
             saveScreenshot(x, y, width, height);
         }
@@ -384,8 +377,10 @@ FreezeScreen {
             x: 4 + (root.modes.slice(0, root.modes.indexOf(root.mode)).filter((m) => {
                 if (m === "edit")
                     return !root.editActive;
+
                 if (m === "temp")
                     return !root.tempActive;
+
                 return true;
             }).length * root.tabItemSize)
 
@@ -395,7 +390,9 @@ FreezeScreen {
                     damping: 0.25
                     mass: 1
                 }
+
             }
+
         }
 
         Row {
@@ -461,7 +458,9 @@ FreezeScreen {
                             NumberAnimation {
                                 duration: 150
                             }
+
                         }
+
                     }
 
                     Behavior on width {
@@ -470,9 +469,13 @@ FreezeScreen {
                             damping: 0.25
                             mass: 1
                         }
+
                     }
+
                 }
+
             }
+
         }
 
         Behavior on width {
@@ -481,6 +484,7 @@ FreezeScreen {
                 damping: 0.25
                 mass: 1
             }
+
         }
 
         layer.effect: DropShadow {
@@ -490,6 +494,7 @@ FreezeScreen {
             color: theme.barShadow
             verticalOffset: 4
         }
+
     }
 
     QuickToggle {
@@ -528,8 +533,10 @@ FreezeScreen {
         iconColor: {
             if (root.connectivityStatus === 1)
                 return theme.shareConnected;
+
             if (root.connectivityStatus === 2)
                 return theme.shareErrorIcon;
+
             return theme.sharePending;
         }
         backgroundColor: root.connectivityStatus === 2 ? theme.shareErrorBackground : theme.toggleBackground
@@ -557,5 +564,7 @@ FreezeScreen {
                 }
             }
         }
+
     }
+
 }
