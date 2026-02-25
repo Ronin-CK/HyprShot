@@ -51,4 +51,4 @@ errorBackground = "#E74C3C"
 [hooks]
 # Command to run after a screenshot is saved (leave empty to disable)
 # Placeholders: %f = full path, %n = filename, %d = directory, %t = timestamp
-postSaveHook = "~/.local/bin/screenshot-hook.sh %f"
+postSaveHook = ""
